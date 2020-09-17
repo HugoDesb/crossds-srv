@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
@@ -24,7 +25,7 @@ public class MainController {
     private DeezerApiService deezerApiService;
 
     @GetMapping("/hello/{name}")
-    public String sayHello(@PathVariable("name") String name){
+    public @ResponseBody String sayHello(@PathVariable("name") String name){
         return "Hello, "+name;
     }
 
