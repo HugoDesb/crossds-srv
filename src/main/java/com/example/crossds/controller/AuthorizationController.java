@@ -15,6 +15,7 @@ import java.util.List;
 
 @org.springframework.stereotype.Controller
 @RequestMapping("/oauth")
+@CrossOrigin
 public class AuthorizationController extends MainController {
 
     @Autowired
