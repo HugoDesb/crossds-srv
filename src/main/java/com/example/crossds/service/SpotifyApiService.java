@@ -46,7 +46,7 @@ public class SpotifyApiService implements GenericApiService {
 
     private static final String clientId = "8f6c8d03f6804e17b0757a1645854d4f";
     private static final String clientSecret = "b1567c32522c434c8c25611c51ac9d8f";
-    private static final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:8080/api/oauth/spotify/callback");
+    private static final URI redirectUri = SpotifyHttpManager.makeUri("https://protected-tundra-83090.herokuapp.com/oauth/spotify/callback");
 
     private static final SpotifyApi spotifyApi = new SpotifyApi.Builder()
             .setClientId(clientId)

@@ -24,7 +24,7 @@ public class DeezerApiService implements GenericApiService {
 
     private static final String app_id = "407522";
     private static final String secret = "d482da32d0e5f1360bfa87e3ebb810a8";
-    private static final String redirect_uri = "http://localhost:8080/api/oauth/deezer/callback";
+    private static final String redirect_uri = "https://protected-tundra-83090.herokuapp.com/oauth/deezer/callback";
     private static final String permissions = "basic_access,manage_library,offline_access,email,delete_library";
 
 
