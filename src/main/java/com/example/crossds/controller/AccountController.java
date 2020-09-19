@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Controller
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 public class AccountController {
 
     @Autowired

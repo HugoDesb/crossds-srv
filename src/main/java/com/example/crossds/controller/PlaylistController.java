@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Controller // This means that this class is a Controller
-@RequestMapping(path="/api/playlist") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="/playlist") // This means URL's start with /demo (after Application path)
 public class PlaylistController extends MainController {
 
     private Logger logger = LoggerFactory.getLogger(PlaylistController.class);

@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.List;
 
 @org.springframework.stereotype.Controller
-@RequestMapping("/api/oauth")
+@RequestMapping("/oauth")
 public class AuthorizationController extends MainController {
 
     @Autowired
