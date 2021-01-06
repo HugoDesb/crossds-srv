@@ -1,20 +1,21 @@
 package com.example.crossds.service.genericapi;
 
-import com.example.crossds.business.Account;
-import com.example.crossds.business.Track;
-import com.example.crossds.service.ApiResponseWrapper;
-import com.example.crossds.service.Credentials;
-import com.example.crossds.service.deezerApi.models.Playlist;
+import com.example.crossds.model.Account;
+import com.example.crossds.model.Playlist;
+import com.example.crossds.model.Track;
+import com.example.crossds.model.Credentials;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
+@Service
 public interface GenericApiService {
 
     /**
-     * Gets the Oauth URI
-     * @return
+     * Create the Oauth URI
+     * @return the oauth uri
      */
     URI getOAuthUrl();
 
@@ -25,40 +26,30 @@ public interface GenericApiService {
      */
     Credentials getTokens(String code);
 
+
     /**
-     * Gets the account linked to the credentials.
-     * If needed, refresh the tokens.
-     * @param credentials The credentials
-     * @return An ApiResponseWrapper object containing the account as the data property, and the newly refreshed tokens as credentials
+     * Gets the account info.
+     * @param access_token a valid access_token
+     * @return an account object
      */
-    ApiResponseWrapper<Account> getCurrentAccount(Credentials credentials);
+    Account getCurrentAccount(String access_token);
 
     /**
      * Add tracks to the specified playlist.
-     * If needed, refresh the tokens.
-     * @param credentials The credentials
+     * @param access_token a valid access_token
      * @param playlistId The playlist id on the platform
      * @param tracksIds The list of tracks ids to add
-     * @return An ApiResponseWrapper object containing the playlist new hash as the data property, and the newly refreshed tokens as credentials
+     * @return the playlist's new hash
      */
-    ApiResponseWrapper<String> addTracksToPlaylist(Credentials credentials, String playlistId, List<String> tracksIds);
+    String addTracksToPlaylist(String access_token, String playlistId, List<String> tracksIds);
 
     /**
      * Gets the platform track id matching more closely this track.
-     * If needed, refresh the tokens.
-     * @param credentials The credentials
+     * @param access_token a valid access_token
      * @param track The track
-     * @return An ApiResponseWrapper object containing the track id as the data property, and the newly refreshed tokens as credentials
+     * @return the track id
      */
-    ApiResponseWrapper<String> getServiceIdentifier(Credentials credentials, Track track);
-
-    /**
-     * Gets the list of user's playlist.
-     * If needed, refresh the tokens.
-     * @param credentials The credentials
-     * @return An ApiResponseWrapper object containing a List playlists as the data property, and the newly refreshed tokens as credentials
-     */
-    ApiResponseWrapper<List<Playlist>> getAccountPlaylists(Credentials credentials);
+    String getServiceIdentifier(String access_token, Track track);
 
     /**
      * Gets the platform track id of the one matching the ISRC code
@@ -69,12 +60,11 @@ public interface GenericApiService {
 
     /**
      * Gets the specified playlist tracks.
-     * If needed, refresh the tokens.
-     * @param credentials The credentials
+     * @param access_token the access_token
      * @param playlist_id The playlist id on the platform
-     * @return An ApiResponseWrapper object containing a set of the playlist tracks as the data property, and the newly refreshed tokens as credentials
+     * @return a set of playlist tracks objects
      */
-    ApiResponseWrapper<Set<Track>> getPlaylistTracks(Credentials credentials, String playlist_id);
+    Set<Track> getPlaylistTracks(String access_token, String playlist_id);
 
     /**
      * Refresh and returns the tokens
@@ -91,16 +81,16 @@ public interface GenericApiService {
      * @param title The title of the playlist
      * @return An ApiResponseWrapper object containing the playlist id as the data property, and the newly refreshed tokens as credentials
      */
-    ApiResponseWrapper<String> createPlaylist(Credentials credentials, String userId, String title);
+    String createPlaylist(String access_token, String userId, String title);
 
     /**
-     * Gets the playlist hash on the platform. If the operation is successfull, returns the playlist hash as the data property.
-     * If needed, refresh the tokens.
-     * @param credentials The credentials
-     * @param playlistId The playlist id on the platform
-     * @return An ApiResponseWrapper object containing the playlist new hash as the data property, and the newly refreshed tokens as credentials
+     * Gets a playlist snapshot hash
+     * @param access_token a valid access_token
+     * @param playlistId the playlist's id
+     * @return the snapshot hash
      */
-    ApiResponseWrapper<String> getPlayilstSnapshotHash(Credentials credentials, String playlistId);
+    String getPlaylistSnapshotHash(String access_token, String playlistId);
 
 
+    Playlist getPlaylistInfo(String access_token, String playlistId);
 }

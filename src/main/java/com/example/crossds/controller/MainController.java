@@ -1,7 +1,7 @@
 package com.example.crossds.controller;
 
-import com.example.crossds.business.Account;
-import com.example.crossds.business.Platform;
+import com.example.crossds.model.Account;
+import com.example.crossds.model.Platform;
 import com.example.crossds.service.DeezerApiService;
 import com.example.crossds.service.SpotifyApiService;
 import com.example.crossds.service.genericapi.GenericApiService;

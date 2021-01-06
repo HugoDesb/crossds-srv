@@ -1,4 +1,4 @@
-package com.example.crossds.business;
+package com.example.crossds.model;
 
 
 import com.example.crossds.service.Credentials;

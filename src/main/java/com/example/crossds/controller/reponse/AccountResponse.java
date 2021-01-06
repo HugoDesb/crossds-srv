@@ -1,6 +1,6 @@
 package com.example.crossds.controller.reponse;
 
-import com.example.crossds.business.Account;
+import com.example.crossds.model.Account;
 
 public class AccountResponse {
 

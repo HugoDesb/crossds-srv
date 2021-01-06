@@ -1,15 +1,12 @@
 package com.example.crossds.service;
 
-import com.example.crossds.business.Account;
-import com.example.crossds.business.Platform;
-import com.example.crossds.controller.reponse.exceptions.AuthenticationException;
+import com.example.crossds.model.Account;
+import com.example.crossds.model.Platform;
+import com.example.crossds.model.Playlist;
 import com.example.crossds.service.deezerApi.IdObject;
 import com.example.crossds.service.deezerApi.User;
-import com.example.crossds.service.deezerApi.models.*;
+import com.example.crossds.service.deezerApi.models.PlaylistDzr;
 import com.example.crossds.service.genericapi.GenericApiService;
-import com.example.crossds.service.genericapi.exceptions.AddTracksException;
-import com.example.crossds.service.genericapi.exceptions.GetAccountException;
-import com.example.crossds.service.genericapi.exceptions.GetTrackException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -58,7 +55,7 @@ public class DeezerApiService implements GenericApiService {
     }
 
     @Override
-    public ApiResponseWrapper<Account> getCurrentAccount(Credentials credentials) throws GetAccountException {
+    public Account getCurrentAccount(String access_token) throws GetAccountException {
 
         Account account = new Account();
         User ret;
@@ -66,21 +63,19 @@ public class DeezerApiService implements GenericApiService {
             WebClient webClient = WebClient.builder().baseUrl("https://api.deezer.com").build();
             Mono<User> mono = webClient.get()
                     .uri(uriBuilder -> uriBuilder.path("/user/me")
-                            .queryParam("access_token", credentials.getAccess_token())
+                            .queryParam("access_token", access_token)
                             .build())
                     .retrieve()
                     .bodyToMono(User.class);
             ret =  mono.block();
 
-
-            account.setCredentials(credentials);
             account.setDisplayName(ret.getDisplayName());
             account.setPicture_url(ret.getPicture_url());
             account.setEmail(ret.getEmail());
             account.setUsername(ret.getUsername());
             account.setPlatform(Platform.DEEZER);
 
-            return new ApiResponseWrapper<>(credentials, account);
+            return account;
         }catch (Exception e){
             e.printStackTrace();
             throw new GetAccountException(Platform.DEEZER);
@@ -88,34 +83,52 @@ public class DeezerApiService implements GenericApiService {
     }
 
     @Override
-    public ApiResponseWrapper<List<Playlist>> getAccountPlaylists(Credentials credentials) {
+    public List<Playlist> getAccountPlaylists(String access_token) {
         WebClient webClient = WebClient.builder().baseUrl("https://api.deezer.com").build();
         Mono<PlaylistData> mono = webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/user/me/playlists")
-                        .queryParam("access_token", credentials.getAccess_token())
+                        .queryParam("access_token", access_token)
                         .build())
                 .retrieve()
                 .bodyToMono(PlaylistData.class);
         PlaylistData ret =  mono.block();
-        return new ApiResponseWrapper<>(credentials, ret.getData());
+        return ret.getData();
     }
 
     @Override
-    public ApiResponseWrapper<String> createPlaylist(Credentials credentials, String userId, String title) {
+    public String createPlaylist(String access_token, String userId, String title) {
         WebClient webClient = WebClient.builder().baseUrl("https://api.deezer.com").build();
         Mono<IdObject> mono = webClient.post()
                 .uri(uriBuilder -> uriBuilder.path("/user/me/playlists")
-                        .queryParam("access_token", credentials.getAccess_token())
+                        .queryParam("access_token", access_token)
                         .queryParam("title", title)
                         .build())
                 .retrieve()
                 .bodyToMono(IdObject.class);
         IdObject ret =  mono.block();
-        return new ApiResponseWrapper<>(credentials, ret.getId());
+        return ret.getId();
     }
 
     @Override
-    public ApiResponseWrapper<String> addTracksToPlaylist(Credentials credentials, String playlistId, List<String> tracksIds) {
+    public Playlist getPlaylistInfo(String access_token, String playlistId) {
+        WebClient webClient = WebClient.builder().baseUrl("https://api.deezer.com").build();
+        Mono<PlaylistDzr> mono = webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/playlist/{playlist_id}")
+                        .queryParam("access_token", access_token)
+                        .build(playlistId))
+                .retrieve()
+                .bodyToMono(PlaylistDzr.class);
+        PlaylistDzr ret =  mono.block();
+
+        Playlist playlist = new Playlist();
+        playlist.setPlatform_id(ret.getId().toString());
+        playlist.setLink(ret.getLink());
+        playlist.setSnapshot_hash(ret.getChecksum());
+
+    }
+
+    @Override
+    public String addTracksToPlaylist(String access_token, String playlistId, List<String> tracksIds) {
 
         if(tracksIds.size()==0){
             throw new IllegalArgumentException("No tracks ids have been specified");
@@ -131,7 +144,7 @@ public class DeezerApiService implements GenericApiService {
         WebClient webClient = WebClient.builder().baseUrl("https://api.deezer.com").build();
         Mono<Boolean> mono = webClient.post()
                 .uri(uriBuilder -> uriBuilder.path("/playlist/{playlist_id}/tracks")
-                        .queryParam("access_token", credentials.getAccess_token())
+                        .queryParam("access_token", access_token)
                         .queryParam("songs", songs.toString())
                         .build(playlistId))
                 .retrieve()
@@ -139,17 +152,17 @@ public class DeezerApiService implements GenericApiService {
         Boolean ret =  mono.block();
 
         if(ret){
-            return getPlayilstSnapshotHash(credentials, playlistId);
+            return playlistId;
         }else{
             throw new AddTracksException(Platform.DEEZER);
         }
     }
 
     @Override
-    public ApiResponseWrapper<String> getServiceIdentifier(Credentials credentials, com.example.crossds.business.Track t) {
+    public String getServiceIdentifier(String access_token, com.example.crossds.model.Track t) {
         String firstAttempt = getServiceIdentifierBasedOnIsrc(t.getIsrc());
         if(firstAttempt!= null){
-            return new ApiResponseWrapper<String>(credentials, firstAttempt);
+            return firstAttempt;
         }else{
             throw new GetTrackException(Platform.SPOTIFY);
         }
@@ -186,9 +199,9 @@ public class DeezerApiService implements GenericApiService {
     }
 
     @Override
-    public ApiResponseWrapper<Set<com.example.crossds.business.Track>> getPlaylistTracks(Credentials credentials, String playlist_id) {
-        Set<com.example.crossds.business.Track> tracks = new HashSet<>();
-        com.example.crossds.business.Track trackToAdd;
+    public Set<com.example.crossds.model.Track> getPlaylistTracks(Credentials credentials, String playlist_id) {
+        Set<com.example.crossds.model.Track> tracks = new HashSet<>();
+        com.example.crossds.model.Track trackToAdd;
 
 
         WebClient webClient = WebClient.builder().baseUrl("https://api.deezer.com").build();
@@ -202,7 +215,7 @@ public class DeezerApiService implements GenericApiService {
 
         for (Track t :
                 ret.getData()) {
-            trackToAdd = new com.example.crossds.business.Track();
+            trackToAdd = new com.example.crossds.model.Track();
             trackToAdd.setAlbum_name(t.getAlbum().getTitle());
             trackToAdd.setArtist_name(t.getArtist().getName());
             trackToAdd.setDeezer_identifier(t.getId());
@@ -211,11 +224,11 @@ public class DeezerApiService implements GenericApiService {
             tracks.add(trackToAdd);
         }
 
-        return new ApiResponseWrapper<>(credentials, tracks);
+        return tracks;
     }
 
     @Override
-    public ApiResponseWrapper<String> getPlayilstSnapshotHash(Credentials credentials, String playlistId) {
+    public String getPlayilstSnapshotHash(Credentials credentials, String playlistId) {
         WebClient webClient = WebClient.builder().baseUrl("https://api.deezer.com").build();
         Mono<Playlist> mono = webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/playlist/{playlist_id}")
@@ -224,7 +237,7 @@ public class DeezerApiService implements GenericApiService {
                 .retrieve()
                 .bodyToMono(Playlist.class);
         Playlist ret =  mono.block();
-        return new ApiResponseWrapper<>(credentials, ret.getChecksum());
+        return ret.getChecksum();
     }
 
     @Override

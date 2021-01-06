@@ -1,4 +1,4 @@
-package com.example.crossds.business;
+package com.example.crossds.model;
 
 public enum Platform {
 

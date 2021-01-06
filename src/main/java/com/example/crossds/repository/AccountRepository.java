@@ -1,7 +1,7 @@
 package com.example.crossds.repository;
 
-import com.example.crossds.business.Account;
-import com.example.crossds.business.Platform;
+import com.example.crossds.model.Account;
+import com.example.crossds.model.Platform;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

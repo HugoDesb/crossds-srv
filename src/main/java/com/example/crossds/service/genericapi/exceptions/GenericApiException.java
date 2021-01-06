@@ -1,12 +1,17 @@
 package com.example.crossds.service.genericapi.exceptions;
 
-import com.example.crossds.business.Platform;
+import org.apache.hc.core5.http.HttpException;
 
-public class GenericApiException extends RuntimeException{
+public class GenericApiException extends HttpException {
 
-    private String message;
+    public GenericApiException() {
+    }
 
-    public GenericApiException(String message, Platform platform) {
-        this.message = message + " on platform["+platform.getName()+"]";
+    public GenericApiException(String message) {
+        super(message);
+    }
+
+    public GenericApiException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.crossds.business;
+package com.example.crossds.model;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -146,5 +146,23 @@ public class Track {
                 return deezer_identifier!= null && !deezer_identifier.isEmpty();
         }
         return false;
+    }
+
+    public static class Builder {
+        private Long id_track;
+        private String isrc;
+        private boolean spotify_availability;
+        private String spotify_identifier;
+        private boolean deezer_availability;
+        private String deezer_identifier;
+
+        public Track buildFromSpotifyTrack(com.wrapper.spotify.model_objects.specification.Track other){
+            Track t = new Track();
+            t.setIsrc(other.getExternalIds().getExternalIds().get("isrc"));
+            t.setSpotify_identifier(other.getId());
+            t.setSpotify_availability(true);
+            return t;
+        }
+
     }
 }

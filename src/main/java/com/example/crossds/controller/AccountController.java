@@ -1,7 +1,7 @@
 package com.example.crossds.controller;
 
-import com.example.crossds.business.Account;
-import com.example.crossds.business.AccountPlaylist;
+import com.example.crossds.model.Account;
+import com.example.crossds.model.AccountPlaylist;
 import com.example.crossds.controller.reponse.AccountResponse;
 import com.example.crossds.controller.reponse.exceptions.AccountNotFoundException;
 import com.example.crossds.repository.AccountRepository;
